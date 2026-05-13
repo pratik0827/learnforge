@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — Learn Forge</title>
+  <meta name="description" content="Track your progress, manage bookmarked projects, and see your completed builds on Learn Forge." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <style>
+    .profile-header {
+      background: linear-gradient(180deg, rgba(124,92,252,0.08) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 0 40px;
+    }
+    .profile-card {
+      display: flex; align-items: flex-start; gap: 32px; flex-wrap: wrap;
+    }
+    .profile-avatar-wrap { position: relative; flex-shrink: 0; }
+    .profile-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      object-fit: cover; border: 3px solid var(--accent);
+      box-shadow: 0 0 30px rgba(124,92,252,0.3);
+    }
+    .profile-avatar-placeholder {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 700; color: #fff;
+      border: 3px solid var(--accent); box-shadow: 0 0 30px rgba(124,92,252,0.3);
+    }
+    .online-dot {
+      position: absolute; bottom: 4px; right: 4px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--easy); border: 2px solid var(--bg-base);
+    }
+    .profile-info { flex: 1; min-width: 200px; }
+    .profile-name {
+      font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .profile-email { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+    .profile-stats {
+      display: flex; gap: 28px; flex-wrap: wrap;
+    }
+    .profile-stat { text-align: center; }
+    .profile-stat-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700;
+      color: var(--accent-light);
+    }
+    .profile-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .profile-tabs {
+      display: flex; gap: 4px; border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .profile-tab {
+      padding: 12px 20px; font-size: 14px; font-weight: 500;
+      background: transparent; color: var(--text-muted);
+      border: none; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: var(--transition); cursor: pointer;
+    }
+    .profile-tab.active { color: var(--accent-light); border-bottom-color: var(--accent); }
+    .profile-tab:hover { color: var(--text-secondary); }
+
+    .progress-project-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: var(--transition);
+    }
+    .progress-project-card:hover { border-color: var(--border-hover); }
+
+    .completed-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(34,209,122,0.1); color: var(--easy);
+      border: 1px solid rgba(34,209,122,0.2);
+      padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--text-muted);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-title { font-size: 18px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+    .empty-desc { font-size: 14px; line-height: 1.6; max-width: 320px; margin: 0 auto 24px; }
+
+    .streak-card {
+      background: linear-gradient(135deg, rgba(124,92,252,0.12), rgba(91,138,240,0.06));
+      border: 1px solid rgba(124,92,252,0.2); border-radius: var(--radius-lg);
+      padding: 24px; margin-bottom: 28px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .streak-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .not-logged-in {
+      text-align: center; padding: 100px 20px;
+    }
+    .not-logged-in h2 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">⚡</div>
+      Learn&nbsp;Forge
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" id="nav-projects">Projects</a></li>
+      <li><a href="solutions.html" id="nav-solutions">Solutions</a></li>
+      <li><a href="index.html#mentors" id="nav-mentors">Mentors</a></li>
+    </ul>
+    <div class="nav-actions" id="nav-actions">
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='index.html'">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html'">Get Started</button>
+    </div>
+    <div class="nav-actions" id="user-section" style="display:none; position:relative;">
+      <button class="nav-user-btn" id="user-btn" onclick="toggleUserMenu()">
+        <img id="user-avatar-nav" src="" alt="User avatar" />
+        <span id="user-display-name">User</span>
+        <span>▾</span>
+      </button>
+      <div class="user-menu" id="user-menu">
+        <button class="user-menu-item" onclick="window.location.href='profile.html'">
+          <span class="user-menu-item-icon">👤</span> My Profile
+        </button>
+        <div class="user-menu-divider"></div>
+        <button class="user-menu-item" onclick="signOut()" style="color:#f05b8a">
+          <span class="user-menu-item-icon">🚪</span> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- NOT LOGGED IN STATE -->
+<div id="not-logged-in" class="not-logged-in" style="display:none;">
+  <div style="font-size:64px; margin-bottom:20px;">🔐</div>
+  <h2>Sign in to see your profile</h2>
+  <p style="color:var(--text-muted); margin-bottom:28px;">Track your progress, manage bookmarks, and see your completed projects.</p>
+  <a href="index.html" class="btn btn-primary">Go to Home →</a>
+</div>
+
+<!-- PROFILE CONTENT -->
+<div id="profile-page" style="display:none;">
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="container">
+      <div class="profile-card">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar-placeholder" id="profile-avatar-placeholder">?</div>
+          <img id="profile-avatar-img" class="profile-avatar" src="" alt="Profile avatar" style="display:none;" />
+          <div class="online-dot"></div>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name" id="profile-name">Loading…</div>
+          <div class="profile-email" id="profile-email">…</div>
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <div class="profile-stat-num" id="stat-inprogress">0</div>
+              <div class="profile-stat-label">In Progress</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat-num" id="stat-completed">0</div>
+              <div class="profile-stat-label">Completed</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat-num" id="stat-saved">0</div>
+              <div class="profile-stat-label">Saved</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="signout-btn" onclick="signOut()" style="align-self:flex-start;">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="container" style="padding-top:40px;">
+
+    <div class="streak-card">
+      <div>
+        <div class="streak-num" id="streak-num">0🔥</div>
+        <div style="font-size:13px; color:var(--text-muted);">Day Streak</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; margin-bottom:4px;">Keep building!</div>
+        <div style="font-size:14px; color:var(--text-muted);">Start or continue a project today to maintain your streak.</div>
+      </div>
+      <a href="index.html" class="btn btn-primary btn-sm">Browse Projects →</a>
+    </div>
+
+    <div class="profile-tabs">
+      <button class="profile-tab active" data-ptab="in-progress" id="ptab-inprogress">In Progress</button>
+      <button class="profile-tab" data-ptab="completed"         id="ptab-completed">Completed</button>
+      <button class="profile-tab" data-ptab="saved"             id="ptab-saved">Saved</button>
+    </div>
+
+    <!-- IN PROGRESS -->
+    <div class="tab-content active" id="tab-in-progress">
+      <div class="projects-grid" id="inprogress-grid" role="list"></div>
+      <div class="empty-state" id="inprogress-empty">
+        <div class="empty-icon">🛠️</div>
+        <div class="empty-title">No projects in progress</div>
+        <p class="empty-desc">Browse projects and click "Start This Project" to begin tracking your progress.</p>
+        <a href="index.html" class="btn btn-primary">Browse Projects</a>
+      </div>
+    </div>
+
+    <!-- COMPLETED -->
+    <div class="tab-content" id="tab-completed">
+      <div class="projects-grid" id="completed-grid" role="list"></div>
+      <div class="empty-state" id="completed-empty">
+        <div class="empty-icon">🏆</div>
+        <div class="empty-title">No completed projects yet</div>
+        <p class="empty-desc">Finish a project and mark it as complete to see it here. You've got this!</p>
+        <a href="index.html" class="btn btn-primary">Start a Project</a>
+      </div>
+    </div>
+
+    <!-- SAVED -->
+    <div class="tab-content" id="tab-saved">
+      <div class="projects-grid" id="saved-grid" role="list"></div>
+      <div class="empty-state" id="saved-empty">
+        <div class="empty-icon">🔖</div>
+        <div class="empty-title">No saved projects</div>
+        <p class="empty-desc">Bookmark projects you want to try later by clicking the 🔖 button on any project.</p>
+        <a href="index.html" class="btn btn-primary">Browse Projects</a>
+      </div>
+    </div>
+
+    <div style="padding-bottom:80px;"></div>
+  </div>
+</div>
+
+<footer style="margin-top:0;">
+  <div class="footer-bottom" style="margin-top:0; padding-top:24px; border-top:1px solid var(--border); max-width:1200px; margin:0 auto; padding:24px 24px 0;">
+    <span>© 2024 Learn Forge</span>
+    <span>Made with ❤️ for developers</span>
+  </div>
+  <div style="height:24px;"></div>
+</footer>
+
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import {
+  collection, getDocs, doc, getDoc, setDoc,
+  deleteDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+let currentUser = null;
+
+const ALL_PROJECTS = [
+  { id:'web-maps-theme', title:'Build a Custom Google Maps Theme', category:'web', difficulty:'easy', tags:['Google Maps API','GCP','CSS'], devs:5738 },
+  { id:'web-image-gallery', title:'Image Search Gallery', category:'web', difficulty:'medium', tags:['Unsplash API','React','REST'], devs:889 },
+  { id:'web-downtime-monitor', title:'Downtime Monitoring with Alerts', category:'web', difficulty:'hard', tags:['Node.js','MongoDB','Express'], devs:696 },
+  { id:'web-expense-tracker', title:'Personal Expense Tracker', category:'web', difficulty:'medium', tags:['Chart.js','React'], devs:3201 },
+  { id:'web-portfolio', title:'Animated Developer Portfolio', category:'web', difficulty:'easy', tags:['CSS Animations','JavaScript'], devs:7812 },
+  { id:'web-chat-app', title:'Real-Time Chat Application', category:'web', difficulty:'hard', tags:['WebSockets','Firebase'], devs:1543 },
+  { id:'mob-temp-converter', title:'Temperature Converter App', category:'mobile', difficulty:'easy', tags:['Swift','React Native'], devs:812 },
+  { id:'mob-food-journal', title:'Food Journal Mobile App', category:'mobile', difficulty:'medium', tags:['Camera API','Local DB'], devs:473 },
+  { id:'mob-invoice-app', title:'Invoicing & Payment Reminder App', category:'mobile', difficulty:'hard', tags:['Stripe','Push Notifications'], devs:1111 },
+  { id:'tool-slack-bot', title:'Slack Bot: PageSpeed Insights', category:'tool', difficulty:'easy', tags:['Slack API','Google PageSpeed'], devs:395 },
+  { id:'tool-web-scraper', title:'Web Scraper for News Articles', category:'tool', difficulty:'easy', tags:['BeautifulSoup','Python'], devs:2987 },
+  { id:'tool-bg-jobs', title:'Background Job System', category:'tool', difficulty:'medium', tags:['Redis','Queue'], devs:865 },
+  { id:'tool-github-analyzer', title:'GitHub Repository Analyzer', category:'tool', difficulty:'medium', tags:['GitHub API','Pandas'], devs:1204 },
+  { id:'tool-cli-todo', title:'Feature-Rich CLI Todo App', category:'tool', difficulty:'easy', tags:['CLI','JSON'], devs:2178 },
+];
+
+const catLabel = c => ({ web:'🌐 Web', mobile:'📱 Mobile', tool:'🛠️ Tools' }[c] || c);
+const formatNum = n => n >= 1000 ? (n/1000).toFixed(1)+'k' : n;
+
+function renderProjectList(containerId, emptyId, projects, showComplete=false) {
+  const grid = document.getElementById(containerId);
+  const empty = document.getElementById(emptyId);
+  if (!projects.length) {
+    grid.innerHTML = ''; empty.style.display = 'block'; return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = projects.map((p, i) => `
+    <div class="progress-project-card" style="animation:fadeInUp 0.3s ease ${i*50}ms both" role="listitem">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+        <div>
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+            <span class="badge badge-${p.difficulty}">${p.difficulty}</span>
+            <span class="card-category">${catLabel(p.category)}</span>
+            ${showComplete ? '<span class="completed-badge">✓ Completed</span>' : ''}
+          </div>
+          <h3 style="font-family:\'Space Grotesk\',sans-serif; font-size:16px; font-weight:600; margin-bottom:8px; line-height:1.3;">${p.title}</h3>
+          <div class="card-tech" style="margin-bottom:0;">
+            ${(p.tags||[]).map(t=>`<span class="tech-tag">${t}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:4px; flex-wrap:wrap;">
+        <a href="index.html" class="btn btn-ghost btn-sm">View Project</a>
+        ${!showComplete ? `<button class="btn btn-primary btn-sm" onclick="markComplete('${p.id}')">Mark Complete ✓</button>` : ''}
+        <button class="btn btn-ghost btn-sm" style="color:var(--hard);" onclick="removeProject('${p.id}','${containerId}')">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+async function loadUserData(user) {
+  try {
+    const ref = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+
+    const inProgressIds = data.inProgress || [];
+    const completedIds  = data.completed  || [];
+    const savedIds      = data.saved      || [];
+
+    document.getElementById('stat-inprogress').textContent = inProgressIds.length;
+    document.getElementById('stat-completed').textContent  = completedIds.length;
+    document.getElementById('stat-saved').textContent      = savedIds.length;
+    document.getElementById('streak-num').textContent      = `${Math.min(completedIds.length * 3 + inProgressIds.length, 30)}🔥`;
+
+    const toProjects = ids => ids.map(id => ALL_PROJECTS.find(p => p.id === id)).filter(Boolean);
+    renderProjectList('inprogress-grid', 'inprogress-empty', toProjects(inProgressIds), false);
+    renderProjectList('completed-grid',  'completed-empty',  toProjects(completedIds),  true);
+    renderProjectList('saved-grid',      'saved-empty',      toProjects(savedIds),       false);
+
+  } catch(e) {
+    // Firestore not configured — show empty state
+    renderProjectList('inprogress-grid', 'inprogress-empty', [], false);
+    renderProjectList('completed-grid',  'completed-empty',  [], true);
+    renderProjectList('saved-grid',      'saved-empty',      [], false);
+  }
+}
+
+window.markComplete = async function(projectId) {
+  if (!currentUser) return;
+  try {
+    const ref = doc(db, 'users', currentUser.uid);
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+    const ip = (data.inProgress || []).filter(id => id !== projectId);
+    const done = [...new Set([...(data.completed || []), projectId])];
+    await updateDoc(ref, { inProgress: ip, completed: done });
+    showToast('Marked as complete! 🏆', 'success');
+    loadUserData(currentUser);
+  } catch(e) { showToast('Could not update. Check Firebase config.', 'error'); }
+};
+
+window.removeProject = async function(projectId, fromGrid) {
+  if (!currentUser) return;
+  const fieldMap = { 'inprogress-grid':'inProgress','completed-grid':'completed','saved-grid':'saved' };
+  const field = fieldMap[fromGrid];
+  try {
+    const ref = doc(db, 'users', currentUser.uid);
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+    await updateDoc(ref, { [field]: (data[field]||[]).filter(id => id !== projectId) });
+    showToast('Removed', 'info');
+    loadUserData(currentUser);
+  } catch(e) {}
+};
+
+// Tab switching
+document.querySelectorAll('.profile-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`tab-${btn.dataset.ptab}`).classList.add('active');
+  });
+});
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  if (!user) {
+    document.getElementById('not-logged-in').style.display = 'block';
+    document.getElementById('profile-page').style.display  = 'none';
+    document.getElementById('nav-actions').style.display  = 'flex';
+    document.getElementById('user-section').style.display = 'none';
+    return;
+  }
+  document.getElementById('not-logged-in').style.display = 'none';
+  document.getElementById('profile-page').style.display  = 'block';
+  document.getElementById('nav-actions').style.display  = 'none';
+  document.getElementById('user-section').style.display = 'flex';
+
+  // Fill nav
+  const nameShort = (user.displayName||'').split(' ')[0] || 'Account';
+  document.getElementById('user-display-name').textContent = nameShort;
+  const navAv = document.getElementById('user-avatar-nav');
+  navAv.src = user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.displayName||user.email)}`;
+
+  // Fill profile header
+  document.getElementById('profile-name').textContent = user.displayName || 'Anonymous Dev';
+  document.getElementById('profile-email').textContent = user.email;
+  const initials = (user.displayName||'A').charAt(0).toUpperCase();
+  const placeholder = document.getElementById('profile-avatar-placeholder');
+  const avatarImg = document.getElementById('profile-avatar-img');
+  if (user.photoURL) {
+    placeholder.style.display = 'none';
+    avatarImg.style.display = 'block';
+    avatarImg.src = user.photoURL;
+  } else {
+    placeholder.textContent = initials;
+  }
+
+  loadUserData(user);
+});
+
+window.signOut = async function() {
+  try { await fbSignOut(auth); window.location.href = 'index.html'; } catch(e) {}
+};
+window.toggleUserMenu = () => document.getElementById('user-menu').classList.toggle('open');
+document.addEventListener('click', e => {
+  const m = document.getElementById('user-menu');
+  const b = document.getElementById('user-btn');
+  if (m && b && !m.contains(e.target) && !b.contains(e.target)) m.classList.remove('open');
+});
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+window.showToast = function(msg, type='info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<span>${icons[type]||''}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Projects — Learn Forge</title>
+  <meta name="description" content="View and manage all the projects you've submitted to Learn Forge." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="projects-page.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <style>
+    .my-projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .my-project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+    }
+
+    .my-project-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .my-project-card-header {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .my-project-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .my-project-card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .my-project-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .my-project-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .my-project-card-date {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .my-project-card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-delete {
+      background: rgba(240, 91, 138, 0.1);
+      border: 1px solid rgba(240, 91, 138, 0.2);
+      color: #f05b8a;
+      border-radius: var(--radius);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-delete:hover {
+      background: rgba(240, 91, 138, 0.2);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 20px;
+      padding: 3px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .status-published {
+      background: rgba(34, 209, 122, 0.12);
+      color: #22d17a;
+    }
+
+    .status-pending {
+      background: rgba(240, 160, 48, 0.12);
+      color: #f0a030;
+    }
+
+    .status-rejected {
+      background: rgba(240, 91, 138, 0.12);
+      color: #f05b8a;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 80px 24px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-xl);
+      margin-top: 48px;
+    }
+
+    .empty-state-icon {
+      font-size: 56px;
+      margin-bottom: 20px;
+    }
+
+    .empty-state-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .empty-state-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+
+    /* Login gate */
+    .login-gate {
+      text-align: center;
+      padding: 100px 24px;
+    }
+
+    .login-gate-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-12px)
+      }
+    }
+
+    /* Stats bar */
+    .my-stats-bar {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 28px;
+      margin: 0 0 8px;
+    }
+
+    .my-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .my-stat-num {
+      font-size: 24px;
+      font-weight: 800;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text-primary);
+    }
+
+    .my-stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Delete confirm */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .confirm-overlay.open {
+      display: flex;
+    }
+
+    .confirm-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 40px 32px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      animation: slideUp 0.25s ease;
+    }
+
+    .confirm-box h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .confirm-box p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" aria-label="Learn Forge Home">
+        <div class="nav-logo-icon">⚡</div>
+        Learn&nbsp;Forge
+      </a>
+      <ul class="nav-links" role="navigation" aria-label="Main navigation">
+        <li><a href="projects.html" id="nav-projects">Browse Projects</a></li>
+        <li><a href="submit-project.html" id="nav-submit">Add Project</a></li>
+        <li><a href="solutions.html" id="nav-solutions">Solutions</a></li>
+        <li><a href="my-projects.html" class="active" id="nav-myprojects">My Projects</a></li>
+      </ul>
+      <div class="nav-actions" id="nav-actions">
+        <button class="btn btn-ghost btn-sm" id="btn-login" onclick="openModal('login')">Sign In</button>
+        <button class="btn btn-primary btn-sm" id="btn-signup" onclick="openModal('signup')">Get Started</button>
+      </div>
+      <div class="nav-actions" id="user-section" style="display:none; position:relative;">
+        <button class="nav-user-btn" id="user-btn" onclick="toggleUserMenu()">
+          <img id="user-avatar" src="" alt="User avatar" />
+          <span id="user-display-name">User</span>
+          <span>▾</span>
+        </button>
+        <div class="user-menu" id="user-menu">
+          <button class="user-menu-item" onclick="window.location.href='profile.html'">
+            <span class="user-menu-item-icon">👤</span> My Profile
+          </button>
+          <button class="user-menu-item" onclick="window.location.href='my-projects.html'">
+            <span class="user-menu-item-icon">📁</span> My Projects
+          </button>
+          <button class="user-menu-item" onclick="window.location.href='submit-project.html'">
+            <span class="user-menu-item-icon">🛠️</span> Add a Project
+          </button>
+          <div class="user-menu-divider"></div>
+          <button class="user-menu-item" onclick="signOut()" style="color:#f05b8a">
+            <span class="user-menu-item-icon">🚪</span> Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════ BREADCRUMB ═══════════════════════ -->
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <a href="index.html">Home</a><span class="bc-sep">›</span>
+      <span>My Projects</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ PAGE HERO ═══════════════════════ -->
+  <section style="padding:56px 0 32px; text-align:center; position:relative; overflow:hidden;">
+    <div
+      style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% -10%,rgba(124,92,252,0.12),transparent 65%);pointer-events:none;">
+    </div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="hero-label">📁 Your Contributions</div>
+      <h1
+        style="font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,4vw,46px);font-weight:700;letter-spacing:-0.03em;margin:18px 0 14px;line-height:1.1;">
+        My Submitted <span
+          style="background:linear-gradient(135deg,var(--accent-light),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Projects</span>
+      </h1>
+      <p style="font-size:16px;color:var(--text-secondary);max-width:480px;margin:0 auto 28px;line-height:1.7;">
+        All the project ideas you've contributed to the Learn Forge community.
+      </p>
+      <a href="submit-project.html" class="btn btn-primary" id="add-project-btn" style="display:none;">➕ Add Another
+        Project</a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ CONTENT ═══════════════════════ -->
+  <div class="container" style="padding-bottom:80px;">
+
+    <!-- Login gate — shown when user is not logged in -->
+    <div class="login-gate" id="login-gate" style="display:none;">
+      <div class="login-gate-icon">🔒</div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:12px;">Sign in to see your projects</h2>
+      <p style="color:var(--text-secondary);margin-bottom:28px;max-width:360px;margin-left:auto;margin-right:auto;">
+        Create an account or sign in to submit and manage your own project ideas.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="openModal('signup')" id="gate-signup-btn">Get Started Free</button>
+        <button class="btn btn-ghost" onclick="openModal('login')" id="gate-login-btn">Sign In</button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading-state" style="text-align:center;padding:80px 0;display:none;">
+      <div style="font-size:36px;margin-bottom:12px;animation:spin 1.2s linear infinite;">⏳</div>
+      <div style="color:var(--text-muted);">Loading your projects…</div>
+    </div>
+    <style>
+      @keyframes spin {
+        to {
+          transform: rotate(360deg)
+        }
+      }
+    </style>
+
+    <!-- Stats bar — shown when loaded -->
+    <div class="my-stats-bar" id="stats-bar" style="display:none;">
+      <div class="my-stat">
+        <div class="my-stat-num" id="stat-submitted">0</div>
+        <div class="my-stat-label">Projects Submitted</div>
+      </div>
+      <div class="my-stat">
+        <div class="my-stat-num" id="stat-published">0</div>
+        <div class="my-stat-label">Published</div>
+      </div>
+      <div class="my-stat">
+        <div class="my-stat-num" id="stat-total-views">0</div>
+        <div class="my-stat-label">Total Views</div>
+      </div>
+    </div>
+
+    <!-- Projects grid -->
+    <div class="my-projects-grid" id="my-projects-grid" style="display:none;"></div>
+
+    <!-- Empty state — no projects yet -->
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="empty-state-icon">🌱</div>
+      <div class="empty-state-title">No projects submitted yet</div>
+      <p class="empty-state-desc">You haven't submitted any projects to Learn Forge. Share a project idea with the
+        community — it could be built by hundreds of developers!</p>
+      <a href="submit-project.html" class="btn btn-primary" id="empty-submit-btn">🛠️ Submit My First Project</a>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════ DELETE CONFIRM DIALOG ═══════════════════════ -->
+  <div class="confirm-overlay" id="confirm-overlay" role="dialog" aria-modal="true">
+    <div class="confirm-box">
+      <div style="font-size:48px;margin-bottom:16px;">🗑️</div>
+      <h3>Delete this project?</h3>
+      <p>This will permanently remove your project from Learn Forge. This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" id="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+        <button class="btn-delete" id="confirm-delete-btn" onclick="confirmDelete()"
+          style="padding:10px 20px;font-size:13px;">Delete Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ AUTH MODAL ═══════════════════════ -->
+  <div class="modal-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-mp">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title-mp">Welcome to Learn Forge</div>
+        <button class="modal-close" onclick="closeModal()" aria-label="Close modal">✕</button>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login-m" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-signup-m" onclick="switchTab('signup')">Create Account</button>
+      </div>
+      <button class="btn-google" id="btn-google-auth" onclick="signInWithGoogle()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4"
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="#34A853"
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="#FBBC05"
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+          <path fill="#EA4335"
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+        </svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider">or</div>
+      <div id="form-login">
+        <div class="form-group"><label class="form-label" for="login-email">Email</label><input class="form-input"
+            type="email" id="login-email" placeholder="you@example.com" /></div>
+        <div class="form-group"><label class="form-label" for="login-password">Password</label><input class="form-input"
+            type="password" id="login-password" placeholder="••••••••" /></div>
+        <button class="btn btn-primary form-submit" id="btn-email-login" onclick="signInWithEmail()">Sign In →</button>
+      </div>
+      <div id="form-signup" style="display:none;">
+        <div class="form-group"><label class="form-label" for="signup-name">Full Name</label><input class="form-input"
+            type="text" id="signup-name" placeholder="Your name" /></div>
+        <div class="form-group"><label class="form-label" for="signup-email">Email</label><input class="form-input"
+            type="email" id="signup-email" placeholder="you@example.com" /></div>
+        <div class="form-group"><label class="form-label" for="signup-password">Password</label><input
+            class="form-input" type="password" id="signup-password" placeholder="Create a strong password" /></div>
+        <button class="btn btn-primary form-submit" id="btn-email-signup" onclick="signUpWithEmail()">Create Account
+          →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+  <script type="module">
+    import { auth, db, googleProvider } from './firebase-config.js';
+    import {
+      signInWithPopup, createUserWithEmailAndPassword,
+      signInWithEmailAndPassword, signOut as fbSignOut,
+      onAuthStateChanged, updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, query, where, getDocs, doc, setDoc, getDoc,
+      deleteDoc, serverTimestamp, orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let currentUser = null;
+    let pendingDeleteId = null;
+    let myProjects = [];
+
+    // ── Load user's submitted projects ─────────────────────────────
+    async function loadMyProjects(user) {
+      document.getElementById('loading-state').style.display = 'block';
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('my-projects-grid').style.display = 'none';
+      document.getElementById('stats-bar').style.display = 'none';
+
+      try {
+        const q = query(
+          collection(db, 'community_projects'),
+          where('authorUid', '==', user.uid),
+          orderBy('createdAt', 'desc')
+        );
+        const snap = await getDocs(q);
+        myProjects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch (e) {
+        // No Firestore or no index — show demo projects from this user
+        myProjects = [];
+        showToast('Could not load from server — showing demo data', 'info');
+      }
+
+      document.getElementById('loading-state').style.display = 'none';
+      renderMyProjects();
+    }
+
+    function renderMyProjects() {
+      const grid = document.getElementById('my-projects-grid');
+      const emptyState = document.getElementById('empty-state');
+      const statsBar = document.getElementById('stats-bar');
+      const addBtn = document.getElementById('add-project-btn');
+
+      addBtn.style.display = 'inline-flex';
+
+      if (myProjects.length === 0) {
+        emptyState.style.display = 'block';
+        grid.style.display = 'none';
+        statsBar.style.display = 'none';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      grid.style.display = 'grid';
+      statsBar.style.display = 'flex';
+
+      // Stats
+      const published = myProjects.filter(p => p.status === 'published').length;
+      const totalViews = myProjects.reduce((s, p) => s + (p.devs || 0), 0);
+      document.getElementById('stat-submitted').textContent = myProjects.length;
+      document.getElementById('stat-published').textContent = published;
+      document.getElementById('stat-total-views').textContent = totalViews >= 1000 ? (totalViews / 1000).toFixed(1) + 'k' : totalViews;
+
+      // Render cards
+      grid.innerHTML = myProjects.map(p => {
+        const statusClass = `status-${p.status || 'published'}`;
+        const statusText = { published: '✅ Published', pending: '⏳ Pending Review', rejected: '❌ Rejected' }[p.status] || '✅ Published';
+        const catEmoji = { web: '🌐', mobile: '📱', tool: '🛠️', ai: '🤖', game: '🎮' }[p.category] || '';
+        const dateStr = p.createdAt?.toDate ? p.createdAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently submitted';
+        return `
+      <div class="my-project-card" id="mp-${p.id}">
+        <div class="my-project-card-header">
+          <div class="my-project-card-title">${catEmoji} ${p.title}</div>
+          <span class="status-badge ${statusClass}">${statusText}</span>
+        </div>
+        <div class="my-project-card-tags">
+          <span class="badge badge-${p.difficulty}">${p.difficulty}</span>
+          ${(p.tags || []).slice(0, 3).map(t => `<span class="tech-tag">${t}</span>`).join('')}
+        </div>
+        <p class="my-project-card-desc">${p.desc || 'No description provided.'}</p>
+        <div class="my-project-card-meta">
+          <div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:2px;">👥 ${p.devs || 0} views · 📅 ${dateStr}</div>
+          </div>
+          <div class="my-project-card-actions">
+            <a href="projects.html?cat=community" class="btn btn-ghost" style="padding:6px 12px;font-size:12px;">View →</a>
+            <button class="btn-delete" onclick="openConfirm('${p.id}')" id="del-${p.id}">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>`;
+      }).join('');
+    }
+
+    // ── Delete flow ────────────────────────────────────────────────
+    window.openConfirm = function (id) {
+      pendingDeleteId = id;
+      document.getElementById('confirm-overlay').classList.add('open');
+    };
+    window.closeConfirm = function () {
+      pendingDeleteId = null;
+      document.getElementById('confirm-overlay').classList.remove('open');
+    };
+    window.confirmDelete = async function () {
+      if (!pendingDeleteId) return;
+      const btn = document.getElementById('confirm-delete-btn');
+      btn.textContent = '⏳ Deleting…'; btn.disabled = true;
+      try {
+        await deleteDoc(doc(db, 'community_projects', pendingDeleteId));
+        myProjects = myProjects.filter(p => p.id !== pendingDeleteId);
+        closeConfirm();
+        renderMyProjects();
+        showToast('Project deleted successfully.', 'info');
+      } catch (e) {
+        showToast('Could not delete. Please try again.', 'error');
+        btn.textContent = 'Delete Project'; btn.disabled = false;
+      }
+    };
+
+    // ── Auth ────────────────────────────────────────────────────────
+    window.openModal = function (tab = 'login') { switchTab(tab); document.getElementById('auth-modal').classList.add('open'); document.body.style.overflow = 'hidden'; };
+    window.closeModal = function () { document.getElementById('auth-modal').classList.remove('open'); document.body.style.overflow = ''; };
+    document.getElementById('auth-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+    window.switchTab = function (tab) {
+      document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+      document.getElementById('form-signup').style.display = tab === 'signup' ? '' : 'none';
+      document.getElementById('tab-login-m').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup-m').classList.toggle('active', tab === 'signup');
+    };
+
+    window.signInWithGoogle = async function () {
+      try { const r = await signInWithPopup(auth, googleProvider); await ensureUserDoc(r.user); closeModal(); showToast(`Welcome! 👋`, 'success'); } catch (e) { showToast('Sign-in failed.', 'error'); }
+    };
+    window.signInWithEmail = async function () {
+      const email = document.getElementById('login-email').value.trim(), pass = document.getElementById('login-password').value;
+      if (!email || !pass) { showToast('Fill in all fields', 'error'); return; }
+      try { await signInWithEmailAndPassword(auth, email, pass); closeModal(); showToast('Welcome back! 👋', 'success'); } catch (e) { showToast('Invalid credentials.', 'error'); }
+    };
+    window.signUpWithEmail = async function () {
+      const name = document.getElementById('signup-name').value.trim(), email = document.getElementById('signup-email').value.trim(), pass = document.getElementById('signup-password').value;
+      if (!name || !email || !pass) { showToast('Fill in all fields', 'error'); return; }
+      try { const r = await createUserWithEmailAndPassword(auth, email, pass); await updateProfile(r.user, { displayName: name }); await ensureUserDoc(r.user, name); closeModal(); showToast(`Welcome, ${name}! 🎉`, 'success'); } catch (e) { showToast('Registration failed.', 'error'); }
+    };
+    async function ensureUserDoc(user, dn) {
+      try { const ref = doc(db, 'users', user.uid), snap = await getDoc(ref); if (!snap.exists()) await setDoc(ref, { uid: user.uid, name: dn || user.displayName || '', email: user.email, photoURL: user.photoURL || '', saved: [], createdAt: serverTimestamp() }); } catch (e) { }
+    }
+
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+      const loginGate = document.getElementById('login-gate');
+      const loadingState = document.getElementById('loading-state');
+      if (user) {
+        document.getElementById('nav-actions').style.display = 'none';
+        document.getElementById('user-section').style.display = 'flex';
+        document.getElementById('user-display-name').textContent = (user.displayName || '').split(' ')[0] || 'Account';
+        document.getElementById('user-avatar').src = user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.displayName || user.email)}`;
+        loginGate.style.display = 'none';
+        loadingState.style.display = 'block';
+        loadMyProjects(user);
+        ensureUserDoc(user);
+      } else {
+        document.getElementById('nav-actions').style.display = 'flex';
+        document.getElementById('user-section').style.display = 'none';
+        loginGate.style.display = 'block';
+        loadingState.style.display = 'none';
+      }
+    });
+
+    window.signOut = async function () { try { await fbSignOut(auth); showToast('Signed out 👋', 'info'); } catch (e) { } };
+    window.toggleUserMenu = function () { document.getElementById('user-menu').classList.toggle('open'); };
+    document.addEventListener('click', e => {
+      const m = document.getElementById('user-menu'), b = document.getElementById('user-btn');
+      if (m && b && !m.contains(e.target) && !b.contains(e.target)) m.classList.remove('open');
+    });
+
+    window.showToast = function (msg, type = 'info') {
+      const c = document.getElementById('toast-container'), t = document.createElement('div');
+      t.className = `toast toast-${type}`;
+      t.innerHTML = `<span>${{ success: '✅', error: '❌', info: 'ℹ️' }[type] || ''}</span><span>${msg}</span>`;
+      c.appendChild(t); setTimeout(() => t.remove(), 3200);
+    };
+
+    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', scrollY > 20), { passive: true });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
+  </script>
+</body>
+
+</html>

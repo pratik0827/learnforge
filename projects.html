@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects â€” Learn Forge | Real-World Programming Projects</title>
+  <meta name="description" content="Browse 36+ real-world programming projects across Web, Mobile, Tools, AI and Games. Filter by language and difficulty. Start building today." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="projects-page.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>âš¡</text></svg>" />
+</head>
+<body>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• NAVBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="Learn Forge Home">
+      <div class="nav-logo-icon">âš¡</div>
+      Learn&nbsp;Forge
+    </a>
+
+    <ul class="nav-links" role="navigation" aria-label="Main navigation">
+      <li><a href="projects.html" class="active" id="nav-projects">Projects</a></li>
+      <li><a href="solutions.html" id="nav-solutions">Solutions</a></li>
+      <li><a href="submit-project.html" id="nav-submit">Submit Project</a></li>
+      <li><a href="index.html#mentors" id="nav-mentors">Mentors</a></li>
+    </ul>
+
+    <div class="nav-actions" id="nav-actions">
+      <button class="btn btn-ghost btn-sm" id="btn-login" onclick="openModal('login')">Sign In</button>
+      <button class="btn btn-primary btn-sm" id="btn-signup" onclick="openModal('signup')">Get Started</button>
+    </div>
+
+    <div class="nav-actions" id="user-section" style="display:none; position:relative;">
+      <button class="nav-user-btn" id="user-btn" onclick="toggleUserMenu()">
+        <img id="user-avatar" src="" alt="User avatar" />
+        <span id="user-display-name">User</span>
+        <span>â–¾</span>
+      </button>
+      <div class="user-menu" id="user-menu">
+        <button class="user-menu-item" onclick="window.location.href='profile.html'">
+          <span class="user-menu-item-icon">ðŸ‘¤</span> My Profile
+        </button>
+        <button class="user-menu-item" onclick="window.location.href='submit-project.html'">
+          <span class="user-menu-item-icon">ðŸ› ï¸</span> Submit Project
+        </button>
+        <div class="user-menu-divider"></div>
+        <button class="user-menu-item" onclick="signOut()" style="color:#f05b8a">
+          <span class="user-menu-item-icon">ðŸšª</span> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE HEADER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<section class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="container" style="position:relative;z-index:1;">
+    <div style="text-align:center; padding:60px 0 40px;">
+      <div class="hero-label">âš¡ 36+ Real-World Projects</div>
+      <h1 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,5vw,54px);font-weight:700;letter-spacing:-0.03em;margin:20px 0 16px;line-height:1.1;">
+        Browse All <span style="background:linear-gradient(135deg,var(--accent-light),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Projects</span>
+      </h1>
+      <p style="font-size:17px;color:var(--text-secondary);max-width:520px;margin:0 auto 32px;line-height:1.7;">
+        Pick a project, build it, share your solution. Every project is designed by senior devs to teach real production skills.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="submit-project.html" class="btn btn-primary" id="submit-project-btn">ðŸ› ï¸ Submit Your Project</a>
+        <a href="#all-projects" class="btn btn-ghost">Browse All â†’</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SEARCH + FILTERS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<section class="filter-section" id="all-projects" aria-label="Project Filters" style="top:68px;">
+  <div class="filter-inner">
+    <!-- Search Bar -->
+    <div class="projects-search-wrap">
+      <span class="search-icon">ðŸ”</span>
+      <input type="text" id="search-input" class="projects-search" placeholder="Search projects by name, tech, or skillâ€¦" autocomplete="off" />
+      <button class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none;">âœ•</button>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="filter-tabs" role="tablist" aria-label="Project categories" style="margin-top:16px;">
+      <button class="filter-tab active" role="tab" aria-selected="true"  data-cat="all"    id="tab-all">All Projects</button>
+      <button class="filter-tab" role="tab" aria-selected="false" data-cat="web"    id="tab-web">ðŸŒ Web</button>
+      <button class="filter-tab" role="tab" aria-selected="false" data-cat="mobile" id="tab-mobile">ðŸ“± Mobile</button>
+      <button class="filter-tab" role="tab" aria-selected="false" data-cat="tool"   id="tab-tool">ðŸ› ï¸ Tools</button>
+      <button class="filter-tab" role="tab" aria-selected="false" data-cat="ai"     id="tab-ai">ðŸ¤– AI / ML</button>
+      <button class="filter-tab" role="tab" aria-selected="false" data-cat="game"   id="tab-game">ðŸŽ® Games</button>
+      <button class="filter-tab" role="tab" aria-selected="false" data-cat="community" id="tab-community">ðŸ’¡ Community</button>
+    </div>
+
+    <!-- Tech Chips -->
+    <div class="tech-filters" role="group" aria-label="Technology filters">
+      <span style="font-size:12px;color:var(--text-muted);align-self:center;margin-right:4px;">Stack:</span>
+      <button class="tech-chip active" data-tech="all" id="chip-all">All</button>
+      <button class="tech-chip" data-tech="javascript" id="chip-js">JavaScript</button>
+      <button class="tech-chip" data-tech="python" id="chip-py">Python</button>
+      <button class="tech-chip" data-tech="react" id="chip-react">React</button>
+      <button class="tech-chip" data-tech="node" id="chip-node">Node.js</button>
+      <button class="tech-chip" data-tech="html-css" id="chip-html">HTML/CSS</button>
+      <button class="tech-chip" data-tech="swift" id="chip-swift">Swift</button>
+      <button class="tech-chip" data-tech="react-native" id="chip-rn">React Native</button>
+      <button class="tech-chip" data-tech="java" id="chip-java">Java</button>
+    </div>
+
+    <!-- Difficulty chips -->
+    <div class="tech-filters" role="group" aria-label="Difficulty filters" style="padding-top:8px;border-top:none;">
+      <span style="font-size:12px;color:var(--text-muted);align-self:center;margin-right:4px;">Difficulty:</span>
+      <button class="diff-chip active" data-diff="all" id="diff-all">All</button>
+      <button class="diff-chip" data-diff="easy" id="diff-easy" style="color:var(--easy);">Easy</button>
+      <button class="diff-chip" data-diff="medium" id="diff-medium" style="color:var(--medium);">Medium</button>
+      <button class="diff-chip" data-diff="hard" id="diff-hard" style="color:var(--hard);">Hard</button>
+    </div>
+  </div>
+</section>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PROJECTS GRID â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<section class="projects-section" style="padding-top:24px;">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-title" id="projects-heading">All Projects</div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="section-count" id="projects-count">Loadingâ€¦</div>
+        <div style="display:flex;gap:6px;">
+          <button class="view-toggle active" id="view-grid" onclick="setView('grid')" title="Grid view">âŠž</button>
+          <button class="view-toggle" id="view-list" onclick="setView('list')" title="List view">â‰¡</button>
+        </div>
+      </div>
+    </div>
+    <div class="projects-grid" id="projects-grid" role="list" aria-label="Project list">
+      <!-- Skeleton loaders -->
+      <div class="project-card" aria-hidden="true">
+        <div class="skeleton" style="height:14px;width:60px;margin-bottom:16px;"></div>
+        <div class="skeleton" style="height:22px;width:80%;margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:14px;width:100%;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:14px;width:90%;margin-bottom:24px;"></div>
+        <div style="display:flex;gap:6px;"><div class="skeleton" style="height:22px;width:70px;"></div><div class="skeleton" style="height:22px;width:60px;"></div></div>
+      </div>
+      <div class="project-card" aria-hidden="true">
+        <div class="skeleton" style="height:14px;width:60px;margin-bottom:16px;"></div>
+        <div class="skeleton" style="height:22px;width:75%;margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:14px;width:100%;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:14px;width:85%;margin-bottom:24px;"></div>
+        <div style="display:flex;gap:6px;"><div class="skeleton" style="height:22px;width:80px;"></div><div class="skeleton" style="height:22px;width:55px;"></div></div>
+      </div>
+      <div class="project-card" aria-hidden="true">
+        <div class="skeleton" style="height:14px;width:60px;margin-bottom:16px;"></div>
+        <div class="skeleton" style="height:22px;width:70%;margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:14px;width:100%;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:14px;width:95%;margin-bottom:24px;"></div>
+        <div style="display:flex;gap:6px;"><div class="skeleton" style="height:22px;width:65px;"></div><div class="skeleton" style="height:22px;width:75px;"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• COMMUNITY PROJECTS SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<section id="community-section" style="display:none; padding: 0 0 80px;">
+  <div class="container">
+    <div style="text-align:center; padding:48px 0 32px;">
+      <div class="section-label">ðŸ’¡ Community Submitted</div>
+      <h2 class="section-heading">Projects from Our Community</h2>
+      <p class="section-sub" style="margin:0 auto 24px;">These projects were submitted by fellow developers. Build them, share your solution, and give feedback.</p>
+      <a href="submit-project.html" class="btn btn-primary" id="submit-btn-community">âž• Add Your Project</a>
+    </div>
+    <div class="projects-grid" id="community-grid" role="list">
+      <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted);">
+        <div style="font-size:48px;margin-bottom:16px;">ðŸŒ±</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Be the first to contribute!</div>
+        <div style="font-size:14px;margin-bottom:24px;">Submit a project idea and help the community grow.</div>
+        <a href="submit-project.html" class="btn btn-primary" id="submit-btn-first">ðŸ› ï¸ Submit a Project</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CALL TO ACTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<section style="padding:60px 0 80px;" id="cta-submit">
+  <div class="container">
+    <div style="background:linear-gradient(135deg,rgba(124,92,252,0.1),rgba(91,138,240,0.06));border:1px solid rgba(124,92,252,0.2);border-radius:var(--radius-xl);padding:56px;text-align:center;">
+      <div class="section-label" style="justify-content:center;display:inline-flex;margin-bottom:20px;">âœ¦ Contribute</div>
+      <h2 class="section-heading">Have a project idea?</h2>
+      <p class="section-sub" style="margin:0 auto 32px;">Submit your own project and get it featured on Learn Forge. Help thousands of developers level up their skills.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <a href="submit-project.html" class="btn btn-primary" id="cta-submit-btn">ðŸ› ï¸ Submit Your Project</a>
+        <a href="solutions.html" class="btn btn-ghost">View Solutions â†’</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FOOTER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<footer aria-label="Footer">
+  <div class="footer-grid">
+    <div>
+      <a href="index.html" class="nav-logo" style="margin-bottom:12px;">
+        <div class="nav-logo-icon">âš¡</div>
+        Learn Forge
+      </a>
+      <p class="footer-brand-desc">Work on real-world projects to improve your skills and build your portfolio.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Projects</div>
+      <ul class="footer-links">
+        <li><a href="projects.html?cat=web">Web Development</a></li>
+        <li><a href="projects.html?cat=mobile">Mobile Apps</a></li>
+        <li><a href="projects.html?cat=tool">Tools &amp; Automation</a></li>
+        <li><a href="projects.html?cat=ai">AI / ML</a></li>
+        <li><a href="projects.html?cat=game">Games</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Community</div>
+      <ul class="footer-links">
+        <li><a href="submit-project.html">Submit a Project</a></li>
+        <li><a href="solutions.html">View Solutions</a></li>
+        <li><a href="profile.html">My Profile</a></li>
+        <li><a href="index.html#mentors">Find a Mentor</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>Â© 2024 Learn Forge. All rights reserved.</span>
+    <span>Made with â¤ï¸ for developers</span>
+  </div>
+</footer>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• AUTH MODAL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div class="modal-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Welcome to Learn Forge</div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close modal">âœ•</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login-m" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-signup-m" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <button class="btn-google" id="btn-google-auth" onclick="signInWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-divider">or</div>
+    <div id="form-login">
+      <div class="form-group"><label class="form-label" for="login-email">Email</label><input class="form-input" type="email" id="login-email" placeholder="you@example.com" /></div>
+      <div class="form-group"><label class="form-label" for="login-password">Password</label><input class="form-input" type="password" id="login-password" placeholder="••••••••" /></div>
+      <button class="btn btn-primary form-submit" id="btn-email-login" onclick="signInWithEmail()">Sign In →</button>
+    </div>
+    <div id="form-signup" style="display:none;">
+      <div class="form-group"><label class="form-label" for="signup-name">Full Name</label><input class="form-input" type="text" id="signup-name" placeholder="Your name" /></div>
+      <div class="form-group"><label class="form-label" for="signup-email">Email</label><input class="form-input" type="email" id="signup-email" placeholder="you@example.com" /></div>
+      <div class="form-group"><label class="form-label" for="signup-password">Password</label><input class="form-input" type="password" id="signup-password" placeholder="Create a strong password" /></div>
+      <button class="btn btn-primary form-submit" id="btn-email-signup" onclick="signUpWithEmail()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────────────── TOAST ────────────────────── -->
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<!-- ────────────────────── SCRIPTS ────────────────────── -->
+<script src="projects-data.js"></script>
+<script type="module" src="auth.js"></script>
+<script>
+// Initialize state and UI logic
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof loadProjects === 'function') loadProjects();
+});
+
+// ────────────────────── State ──────────────────────────────────────────────────
+let allProjects = [];
+let communityProjects = [];
+let filtered = [];
+let activeCategory = 'all';
+let activeTech = 'all';
+let activeDiff = 'all';
+let searchQuery = '';
+let currentView = 'grid';
+
+// ────────────────────── Load Projects ──────────────────────────────────────────
+function loadProjects() {
+  allProjects = window.LF_PROJECTS || [];
+  communityProjects = window.LF_COMMUNITY_DEMO || [];
+
+  const params = new URLSearchParams(window.location.search);
+  const catParam = params.get('cat');
+  if (catParam) {
+    const btn = document.querySelector(`[data-cat="${catParam}"]`);
+    if (btn) {
+      document.querySelectorAll('.filter-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+      btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+      activeCategory = catParam;
+    }
+  }
+  applyFilters();
+  updateCommunitySection();
+}
+
+function updateCommunitySection() {
+  const communitySection = document.getElementById('community-section');
+  const communityGrid = document.getElementById('community-grid');
+  if (!communitySection || !communityGrid) return;
+
+  if (activeCategory === 'community') {
+    communitySection.style.display = '';
+    communityGrid.innerHTML = communityProjects.length > 0 
+      ? communityProjects.map((p, i) => renderCard(p, i)).join('')
+      : `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted);">
+          <div style="font-size:48px;margin-bottom:16px;">💡</div>
+          <div style="font-size:18px;font-weight:600;margin-bottom:8px;color:var(--text-secondary);">No community projects yet</div>
+          <a href="submit-project.html" class="btn btn-primary" style="margin-top:8px;">Be the first to submit →</a>
+        </div>`;
+  } else {
+    communitySection.style.display = 'none';
+  }
+}
+
+function applyFilters() {
+  const grid = document.getElementById('projects-grid');
+  const mainSection = document.querySelector('.projects-section');
+  if (activeCategory === 'community') {
+    if (mainSection) mainSection.style.display = 'none';
+    updateCommunitySection();
+    return;
+  }
+  if (mainSection) mainSection.style.display = '';
+  
+  filtered = allProjects.filter(p => {
+    const catOk = activeCategory === 'all' || p.category === activeCategory;
+    const techOk = activeTech === 'all' || (p.tech && p.tech.includes(activeTech));
+    const diffOk = activeDiff === 'all' || p.difficulty === activeDiff;
+    const q = searchQuery.toLowerCase();
+    const searchOk = !q || p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+    return catOk && techOk && diffOk && searchOk;
+  });
+  renderProjects();
+}
+
+function renderCard(p, i) {
+  const catEmoji = { web:'🌐', mobile:'📱', tool:'🛠️', ai:'🤖', game:'🎮' };
+  return `
+    <article class="project-card${currentView === 'list' ? ' list-view' : ''}" 
+             onclick="window.location.href='project-detail.html?id=${p.id}'"
+             style="animation-delay:${i * 30}ms">
+      <div class="card-top">
+        <span class="badge badge-${p.difficulty}">${p.difficulty}</span>
+        <span class="card-category">${catEmoji[p.category]||''} ${p.category}</span>
+      </div>
+      <h3 class="card-title">${p.title}</h3>
+      <p class="card-desc">${p.desc}</p>
+      <div class="card-tech">${(p.tags||[]).slice(0,3).map(t=>`<span class="tech-tag">${t}</span>`).join('')}</div>
+    </article>`;
+}
+
+function renderProjects() {
+  const grid = document.getElementById('projects-grid');
+  const count = document.getElementById('projects-count');
+  if (!grid) return;
+  if (count) count.textContent = `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
+  grid.innerHTML = filtered.map((p, i) => renderCard(p, i)).join('');
+}
+
+// Event Listeners for Filters
+document.querySelectorAll('.filter-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    applyFilters();
+  });
+});
+
+document.querySelectorAll('.tech-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tech-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTech = btn.dataset.tech;
+    applyFilters();
+  });
+});
+
+document.querySelectorAll('.diff-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diff-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeDiff = btn.dataset.diff;
+    applyFilters();
+  });
+});
+
+const searchInput = document.getElementById('search-input');
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    applyFilters();
+  });
+}
+
+window.setView = function(view) {
+  currentView = view;
+  document.getElementById('view-grid')?.classList.toggle('active', view === 'grid');
+  document.getElementById('view-list')?.classList.toggle('active', view === 'list');
+  renderProjects();
+};
+
+window.showToast = function(msg, type='info') {
+  const c=document.getElementById('toast-container'), t=document.createElement('div');
+  const icons={success:'✅',error:'❌',info:'ℹ️'};
+  t.className=`toast toast-${type}`;
+  t.innerHTML=`<span>${icons[type]||''}</span><span>${msg}</span>`;
+  c.appendChild(t); setTimeout(()=>t.remove(), 3200);
+};
+
+document.addEventListener('click', e => {
+  const menu=document.getElementById('user-menu'), btn=document.getElementById('user-btn');
+  if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)) menu.classList.remove('open');
+});
+
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+}, { passive:true });
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// â”€â”€ Init â€” runs immediately, no Firebase needed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+loadProjects();
+</script>
+
+<!-- Firebase module â€” optional, loads auth + augments Firestore data -->
+<script type="module">
+try {
+  const { auth, db, googleProvider } = await import('./firebase-config.js');
+  window._db = db; // expose db so plain script can use it
+
+  const { signInWithPopup, createUserWithEmailAndPassword,
+          signInWithEmailAndPassword, signOut: fbSignOut,
+          onAuthStateChanged, updateProfile }
+    = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  const { doc, setDoc, getDoc, serverTimestamp }
+    = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+  window.signInWithGoogle = async function() {
+    try { const r=await signInWithPopup(auth,googleProvider); closeModal(); showToast(`Welcome back, ${r.user.displayName}! ðŸ‘‹`,'success'); } catch(e) { showToast('Sign-in failed.','error'); }
+  };
+  window.signInWithEmail = async function() {
+    const email=document.getElementById('login-email').value.trim(), pass=document.getElementById('login-password').value;
+    if(!email||!pass){ showToast('Fill in all fields','error'); return; }
+    try { await signInWithEmailAndPassword(auth,email,pass); closeModal(); showToast('Welcome back! ðŸ‘‹','success'); } catch(e) { showToast('Invalid email or password.','error'); }
+  };
+  window.signUpWithEmail = async function() {
+    const name=document.getElementById('signup-name').value.trim(), email=document.getElementById('signup-email').value.trim(), pass=document.getElementById('signup-password').value;
+    if(!name||!email||!pass){ showToast('Fill in all fields','error'); return; }
+    try { const r=await createUserWithEmailAndPassword(auth,email,pass); await updateProfile(r.user,{displayName:name}); closeModal(); showToast(`Welcome, ${name}! ðŸŽ‰`,'success'); } catch(e) { showToast('Registration failed.','error'); }
+  };
+  window.signOut = async function() { try { await fbSignOut(auth); showToast('Signed out ðŸ‘‹','info'); } catch(e){} };
+
+  onAuthStateChanged(auth, user => {
+    const navActions=document.getElementById('nav-actions'), userSection=document.getElementById('user-section');
+    if(user){
+      navActions.style.display='none'; userSection.style.display='flex';
+      document.getElementById('user-display-name').textContent=(user.displayName||'').split(' ')[0]||'Account';
+      document.getElementById('user-avatar').src=user.photoURL||`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.displayName||user.email)}`;
+    } else {
+      navActions.style.display='flex'; userSection.style.display='none';
+    }
+  });
+} catch(e) {
+  // Firebase unavailable â€” page still works with local data
+  console.info('Firebase not available â€” running in demo mode.');
+}
+</script>
+</body>
+</html>

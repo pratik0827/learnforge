@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project — Learn Forge</title>
+  <meta name="description" content="View project details, requirements, and resources on Learn Forge." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="projects-page.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">⚡</div>Learn&nbsp;Forge
+    </a>
+    <ul class="nav-links" role="navigation">
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="solutions.html">Solutions</a></li>
+      <li><a href="submit-project.html">Submit Project</a></li>
+      <li><a href="index.html#mentors">Mentors</a></li>
+    </ul>
+    <div class="nav-actions" id="nav-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('login')">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('signup')">Get Started</button>
+    </div>
+    <div class="nav-actions" id="user-section" style="display:none;position:relative;">
+      <button class="nav-user-btn" id="user-btn" onclick="toggleUserMenu()">
+        <img id="user-avatar" src="" alt="" /><span id="user-display-name">User</span><span>▾</span>
+      </button>
+      <div class="user-menu" id="user-menu">
+        <button class="user-menu-item" onclick="location.href='profile.html'"><span class="user-menu-item-icon">👤</span>My Profile</button>
+        <button class="user-menu-item" onclick="location.href='submit-project.html'"><span class="user-menu-item-icon">🛠️</span>Submit Project</button>
+        <div class="user-menu-divider"></div>
+        <button class="user-menu-item" onclick="signOut()" style="color:#f05b8a"><span class="user-menu-item-icon">🚪</span>Sign Out</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+  <div class="container">
+    <a href="index.html">Home</a><span class="bc-sep">›</span>
+    <a href="projects.html">Projects</a><span class="bc-sep">›</span>
+    <span id="bc-title">Loading…</span>
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loading-state" style="padding:120px 0;text-align:center;">
+  <div style="font-size:40px;animation:spin 1s linear infinite;display:inline-block;">⚡</div>
+  <div style="color:var(--text-muted);font-size:15px;margin-top:16px;">Loading project…</div>
+</div>
+
+<!-- Not Found -->
+<div id="not-found" style="display:none;text-align:center;padding:120px 24px;">
+  <div style="font-size:60px;margin-bottom:20px;">🔍</div>
+  <h2 style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;margin-bottom:12px;">Project Not Found</h2>
+  <p style="color:var(--text-muted);margin-bottom:28px;">That project doesn't exist or has been removed.</p>
+  <a href="projects.html" class="btn btn-primary">Browse All Projects</a>
+</div>
+
+<!-- Main Content -->
+<main id="project-content" style="display:none;">
+
+  <!-- Hero -->
+  <section class="detail-hero">
+    <div class="detail-hero-bg"></div>
+    <div class="container" style="position:relative;z-index:1;padding-top:56px;padding-bottom:56px;">
+      <div class="detail-hero-inner">
+        <div class="detail-hero-left">
+          <div class="detail-meta-row">
+            <span class="badge" id="d-difficulty"></span>
+            <span class="detail-cat-label" id="d-category"></span>
+            <span id="d-community-tag" style="display:none;background:rgba(240,160,48,0.12);color:#f0a030;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;">💡 Community</span>
+          </div>
+          <h1 class="detail-h1" id="d-title">Project Title</h1>
+          <p class="detail-intro" id="d-desc"></p>
+
+          <div class="detail-stats-row">
+            <div class="dstat"><span class="dstat-icon">👥</span>
+              <div><div class="dstat-val" id="d-devs">--</div><div class="dstat-label">Building this</div></div>
+            </div>
+            <div class="dstat"><span class="dstat-icon">⏱</span>
+              <div><div class="dstat-val" id="d-time">--</div><div class="dstat-label">Est. time</div></div>
+            </div>
+            <div class="dstat"><span class="dstat-icon">📊</span>
+              <div><div class="dstat-val" id="d-diff-label">--</div><div class="dstat-label">Difficulty</div></div>
+            </div>
+          </div>
+
+          <div class="detail-tech-row" id="d-tags"></div>
+
+          <div class="detail-action-row">
+            <button class="btn-start" id="btn-start" onclick="startProject()">🚀 Start This Project</button>
+            <button class="btn-bookmark" id="btn-bookmark" onclick="toggleBookmark()" title="Save for later">🔖</button>
+            <a href="solutions.html" class="btn btn-ghost">Solutions →</a>
+          </div>
+        </div>
+
+        <!-- Card preview -->
+        <div class="detail-hero-right">
+          <div class="project-preview-card">
+            <div class="preview-card-header">
+              <div class="preview-dots">
+                <span style="background:#f05b8a"></span>
+                <span style="background:#f0a030"></span>
+                <span style="background:#22d17a"></span>
+              </div>
+              <span style="font-size:11px;color:var(--text-muted);">project.md</span>
+            </div>
+            <div class="preview-card-body">
+              <div class="preview-line" id="prev-title" style="font-weight:700;font-size:13px;color:var(--text-primary);margin-bottom:8px;"></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;" id="prev-tech"></div>
+              <div class="preview-section-label">Requirements</div>
+              <div id="prev-reqs"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Body -->
+  <div class="container" style="padding:48px 24px 80px;">
+    <div class="detail-body-grid">
+      <div class="detail-main">
+
+        <div class="detail-section-card">
+          <div class="dsec-label">📖 About This Project</div>
+          <p class="dsec-body" id="d-long-desc"></p>
+        </div>
+
+        <div class="detail-section-card">
+          <div class="dsec-label">✅ What You'll Build</div>
+          <ul class="req-list" id="d-requirements"></ul>
+        </div>
+
+        <div class="detail-section-card">
+          <div class="dsec-label">🧠 Skills You'll Practice</div>
+          <div class="skills-grid" id="d-skills"></div>
+        </div>
+
+        <div class="detail-section-card" id="d-resources-section" style="display:none;">
+          <div class="dsec-label">🔗 Helpful Resources</div>
+          <div id="d-resources"></div>
+        </div>
+
+        <div class="detail-section-card" id="d-author-section" style="display:none;">
+          <div class="dsec-label">👤 Submitted By</div>
+          <div id="d-author"></div>
+        </div>
+
+      </div>
+
+      <aside class="detail-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Share</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="share-btn" onclick="copyLink()" id="copy-link-btn">🔗 Copy Link</button>
+            <a class="share-btn" id="share-twitter" href="#" target="_blank">𝕏 Tweet</a>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Similar Projects</div>
+          <div id="similar-projects"></div>
+        </div>
+
+        <div class="sidebar-cta-card">
+          <div style="font-size:32px;margin-bottom:12px;">🚀</div>
+          <div style="font-weight:700;font-size:16px;margin-bottom:8px;">Ready to build?</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">Join 12,000+ developers building real projects.</p>
+          <button class="btn btn-primary" style="width:100%;" onclick="startProject()">Start Building →</button>
+        </div>
+
+        <div class="sidebar-card" style="text-align:center;">
+          <div style="font-size:24px;margin-bottom:10px;">💡</div>
+          <div style="font-weight:600;margin-bottom:6px;font-size:14px;">Have a project idea?</div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">Submit it and get featured on Learn Forge.</p>
+          <a href="submit-project.html" class="btn btn-ghost" style="width:100%;justify-content:center;">Submit a Project</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer aria-label="Footer">
+  <div class="footer-grid">
+    <div>
+      <a href="index.html" class="nav-logo" style="margin-bottom:12px;">
+        <div class="nav-logo-icon">⚡</div>Learn Forge
+      </a>
+      <p class="footer-brand-desc">Work on real-world projects to improve your skills and build your portfolio.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Explore</div>
+      <ul class="footer-links">
+        <li><a href="projects.html">All Projects</a></li>
+        <li><a href="projects.html?cat=web">Web</a></li>
+        <li><a href="projects.html?cat=ai">AI / ML</a></li>
+        <li><a href="projects.html?cat=game">Games</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Community</div>
+      <ul class="footer-links">
+        <li><a href="submit-project.html">Submit a Project</a></li>
+        <li><a href="solutions.html">Solutions</a></li>
+        <li><a href="profile.html">My Profile</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024 Learn Forge. All rights reserved.</span>
+    <span>Made with ❤️ for developers</span>
+  </div>
+</footer>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="auth-modal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Welcome to Learn Forge</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login-m" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-signup-m" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <button class="btn-google" onclick="signInWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-divider">or</div>
+    <div id="form-login">
+      <div class="form-group"><label class="form-label" for="login-email">Email</label><input class="form-input" type="email" id="login-email" placeholder="you@example.com" /></div>
+      <div class="form-group"><label class="form-label" for="login-password">Password</label><input class="form-input" type="password" id="login-password" placeholder="••••••••" /></div>
+      <button class="btn btn-primary form-submit" onclick="signInWithEmail()">Sign In →</button>
+    </div>
+    <div id="form-signup" style="display:none;">
+      <div class="form-group"><label class="form-label" for="signup-name">Full Name</label><input class="form-input" type="text" id="signup-name" placeholder="Your name" /></div>
+      <div class="form-group"><label class="form-label" for="signup-email">Email</label><input class="form-input" type="email" id="signup-email" placeholder="you@example.com" /></div>
+      <div class="form-group"><label class="form-label" for="signup-password">Password</label><input class="form-input" type="password" id="signup-password" placeholder="Create a strong password" /></div>
+      <button class="btn btn-primary form-submit" onclick="signUpWithEmail()">Create Account →</button>
+    </div>
+  </div>
+</div>
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+<style>@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
+
+<script src="projects-data.js"></script>
+<script type="module">
+import { auth, db, googleProvider } from './firebase-config.js';
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUser = null, project = null;
+let savedProjects = new Set();
+
+async function loadProject() {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!id) { showNotFound(); return; }
+
+  project = (window.LF_PROJECTS||[]).find(p => p.id === id);
+
+  if (!project) {
+    try {
+      const snap = await getDoc(doc(db, 'community_projects', id));
+      if (snap.exists()) project = { id: snap.id, ...snap.data(), isUserSubmitted: true };
+    } catch(e) {}
+  }
+
+  if (!project) { showNotFound(); return; }
+  renderProject();
+}
+
+function renderProject() {
+  const p = project;
+  document.title = `${p.title} — Learn Forge`;
+  document.getElementById('bc-title').textContent = p.title;
+
+  // Hero content
+  const diffEl = document.getElementById('d-difficulty');
+  diffEl.textContent = p.difficulty; diffEl.className = `badge badge-${p.difficulty}`;
+  document.getElementById('d-category').textContent = window.LF?.catLabel(p.category) || p.category;
+  if (p.isUserSubmitted) document.getElementById('d-community-tag').style.display = '';
+  document.getElementById('d-title').textContent = p.title;
+  document.getElementById('d-desc').textContent = p.desc;
+  document.getElementById('d-devs').textContent = (window.LF?.formatNum(p.devs)||p.devs||'—') + (p.isUserSubmitted ? '' : '+');
+  document.getElementById('d-time').textContent = p.time || '1–2 weeks';
+  document.getElementById('d-diff-label').textContent = (p.difficulty||'').charAt(0).toUpperCase() + (p.difficulty||'').slice(1);
+  document.getElementById('d-tags').innerHTML = (p.tags||[]).map(t=>`<span class="tech-tag">${t}</span>`).join('');
+
+  // Preview card
+  document.getElementById('prev-title').textContent = p.title;
+  document.getElementById('prev-tech').innerHTML = (p.tech||[]).slice(0,5).map(t=>`<span class="tech-tag" style="font-size:10px;">${t}</span>`).join('');
+  document.getElementById('prev-reqs').innerHTML = (p.requirements||[]).slice(0,4).map(r=>`<div style="font-size:11px;color:var(--text-muted);padding:3px 0;border-left:2px solid var(--accent);padding-left:8px;margin:4px 0;">• ${r}</div>`).join('');
+
+  // Body
+  document.getElementById('d-long-desc').textContent = p.longDesc || p.desc;
+  document.getElementById('d-requirements').innerHTML = (p.requirements||[]).map(r=>`<li><span class="req-dot"></span>${r}</li>`).join('');
+  document.getElementById('d-skills').innerHTML = (p.skills||[]).map(s=>`<div class="skill-chip">${s}</div>`).join('');
+
+  if (p.resources?.length) {
+    document.getElementById('d-resources-section').style.display = '';
+    document.getElementById('d-resources').innerHTML = p.resources.map(r=>`
+      <a href="${r.url}" target="_blank" rel="noopener" class="resource-link">
+        <span>🔗</span><span>${r.label}</span><span style="margin-left:auto;opacity:0.5;">↗</span>
+      </a>`).join('');
+  }
+
+  if (p.authorName) {
+    document.getElementById('d-author-section').style.display = '';
+    document.getElementById('d-author').innerHTML = `<div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;">${(p.authorName||'A')[0].toUpperCase()}</div>
+      <div><div style="font-weight:600;font-size:14px;">${p.authorName}</div><div style="font-size:12px;color:var(--text-muted);">Community Contributor</div></div>
+    </div>`;
+  }
+
+  // Similar projects
+  const similar = (window.LF_PROJECTS||[]).filter(x=>x.id!==p.id&&(x.category===p.category||(x.tech||[]).some(t=>(p.tech||[]).includes(t)))).slice(0,3);
+  document.getElementById('similar-projects').innerHTML = similar.length ? similar.map(s=>`
+    <a href="project-detail.html?id=${s.id}" class="similar-project-item">
+      <div style="flex:1;"><div style="font-size:13px;font-weight:600;margin-bottom:4px;">${s.title}</div>
+        <div style="display:flex;gap:6px;"><span class="badge badge-${s.difficulty}" style="font-size:9px;padding:2px 6px;">${s.difficulty}</span><span style="font-size:11px;color:var(--text-muted);">${s.time||''}</span></div>
+      </div><span style="color:var(--text-muted);">→</span>
+    </a>`).join('') : '<div style="font-size:13px;color:var(--text-muted);">No similar projects found.</div>';
+
+  // Share
+  document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=Check+out:+${encodeURIComponent(p.title)}&url=${encodeURIComponent(location.href)}`;
+
+  updateBookmarkState();
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('project-content').style.display = '';
+}
+
+function showNotFound() {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('not-found').style.display = '';
+}
+
+window.startProject = async function() {
+  if (!currentUser) { openModal('signup'); return; }
+  const id = project.id;
+  try { await setDoc(doc(db,'users',currentUser.uid,'inProgress',id),{projectId:id,startedAt:serverTimestamp()}); } catch(e){}
+  showToast('Project started! Good luck 🚀','success');
+  const btn = document.getElementById('btn-start');
+  btn.textContent = '✅ In Progress'; btn.style.opacity='0.8';
+};
+
+window.toggleBookmark = async function() {
+  if (!currentUser) { openModal('signup'); return; }
+  const id = project.id;
+  const ref = doc(db,'users',currentUser.uid);
+  const isSaved = savedProjects.has(id);
+  if (isSaved) { savedProjects.delete(id); try{await updateDoc(ref,{saved:arrayRemove(id)})}catch(e){} showToast('Removed from saved','info'); }
+  else { savedProjects.add(id); try{await updateDoc(ref,{saved:arrayUnion(id)})}catch(e){} showToast('Saved! 🔖','success'); }
+  updateBookmarkState();
+};
+
+function updateBookmarkState() {
+  if (!project) return;
+  const bm = document.getElementById('btn-bookmark');
+  const isSaved = savedProjects.has(project.id);
+  bm.classList.toggle('saved', isSaved);
+  bm.title = isSaved ? 'Remove from saved' : 'Save for later';
+}
+
+window.copyLink = function() {
+  navigator.clipboard.writeText(location.href).then(()=>{
+    const btn=document.getElementById('copy-link-btn');
+    btn.textContent='✅ Copied!'; setTimeout(()=>btn.textContent='🔗 Copy Link',2000);
+  });
+};
+
+window.openModal=function(tab='login'){switchTab(tab);document.getElementById('auth-modal').classList.add('open');document.body.style.overflow='hidden';};
+window.closeModal=function(){document.getElementById('auth-modal').classList.remove('open');document.body.style.overflow='';};
+document.getElementById('auth-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+window.switchTab=function(tab){document.getElementById('form-login').style.display=tab==='login'?'':'none';document.getElementById('form-signup').style.display=tab==='signup'?'':'none';document.getElementById('tab-login-m').classList.toggle('active',tab==='login');document.getElementById('tab-signup-m').classList.toggle('active',tab==='signup');};
+window.signInWithGoogle=async function(){try{const r=await signInWithPopup(auth,googleProvider);await ensureUserDoc(r.user);closeModal();showToast(`Welcome! 👋`,'success');}catch(e){showToast('Sign-in failed.','error');}};
+window.signInWithEmail=async function(){const email=document.getElementById('login-email').value.trim(),pass=document.getElementById('login-password').value;if(!email||!pass){showToast('Fill in all fields','error');return;}try{await signInWithEmailAndPassword(auth,email,pass);closeModal();showToast('Welcome back! 👋','success');}catch(e){showToast('Invalid credentials.','error');}};
+window.signUpWithEmail=async function(){const name=document.getElementById('signup-name').value.trim(),email=document.getElementById('signup-email').value.trim(),pass=document.getElementById('signup-password').value;if(!name||!email||!pass){showToast('Fill in all fields','error');return;}try{const r=await createUserWithEmailAndPassword(auth,email,pass);await updateProfile(r.user,{displayName:name});await ensureUserDoc(r.user,name);closeModal();showToast(`Welcome, ${name}! 🎉`,'success');}catch(e){showToast('Registration failed.','error');}};
+async function ensureUserDoc(user,dn){try{const ref=doc(db,'users',user.uid),snap=await getDoc(ref);if(!snap.exists())await setDoc(ref,{uid:user.uid,name:dn||user.displayName||'',email:user.email,photoURL:user.photoURL||'',saved:[],createdAt:serverTimestamp()});const data=snap.exists()?snap.data():{};savedProjects=new Set(data.saved||[]);updateBookmarkState();}catch(e){}}
+onAuthStateChanged(auth,user=>{currentUser=user;if(user){document.getElementById('nav-actions').style.display='none';document.getElementById('user-section').style.display='flex';document.getElementById('user-display-name').textContent=(user.displayName||'').split(' ')[0]||'Account';document.getElementById('user-avatar').src=user.photoURL||`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.displayName||user.email)}`;ensureUserDoc(user);}else{document.getElementById('nav-actions').style.display='flex';document.getElementById('user-section').style.display='none';}});
+window.signOut=async function(){try{await fbSignOut(auth);showToast('Signed out 👋','info');}catch(e){}};
+window.toggleUserMenu=function(){document.getElementById('user-menu').classList.toggle('open');};
+document.addEventListener('click',e=>{const m=document.getElementById('user-menu'),b=document.getElementById('user-btn');if(m&&b&&!m.contains(e.target)&&!b.contains(e.target))m.classList.remove('open');});
+window.showToast=function(msg,type='info'){const c=document.getElementById('toast-container'),t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=`<span>${{success:'✅',error:'❌',info:'ℹ️'}[type]||''}</span><span>${msg}</span>`;c.appendChild(t);setTimeout(()=>t.remove(),3200);};
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',scrollY>20),{passive:true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+loadProject();
+</script>
+</body>
+</html>
